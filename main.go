@@ -30,6 +30,9 @@ var (
 	counterKeyMetrics = map[string]string{
 		"$SYS/broker/bytes/received":            "The total number of bytes received since the broker started.",
 		"$SYS/broker/bytes/sent":                "The total number of bytes sent since the broker started.",
+		"$SYS/broker/clients/expired":           "The number of disconnected persistent clients that have been expired and removed through the persistent_client_expiration option.",
+		"$SYS/broker/clients/maximum":           "The maximum number of clients connected simultaneously since the broker started",
+		"$SYS/broker/clients/total":             "The total number of clients connected since the broker started.",
 		"$SYS/broker/messages/received":         "The total number of messages of any type received since the broker started.",
 		"$SYS/broker/messages/sent":             "The total number of messages of any type sent since the broker started.",
 		"$SYS/broker/publish/bytes/received":    "The total number of PUBLISH bytes received since the broker started.",
@@ -38,9 +41,17 @@ var (
 		"$SYS/broker/publish/messages/sent":     "The total number of PUBLISH messages sent since the broker started.",
 		"$SYS/broker/publish/messages/dropped":  "The total number of PUBLISH messages that have been dropped due to inflight/queuing limits.",
 		"$SYS/broker/uptime":                    "The total number of seconds since the broker started.",
-		"$SYS/broker/clients/maximum":           "The maximum number of clients connected simultaneously since the broker started",
-		"$SYS/broker/clients/total":             "The total number of clients connected since the broker started.",
+		"$SYS/broker/subscriptions/count":       "The total number of subscriptions active on the broker.",
+		"$SYS/broker/messages/inflight":         "The number of messages with QoS>0 that are awaiting acknowledgments.",
+
+		"$SYS/broker/load/connections/5min":       "The moving average of the number of CONNECT packets received by the broker over different time intervals.",
+		"$SYS/broker/load/bytes/received/5min":    "The moving average of the number of bytes received by the broker over different time intervals.",
+		"$SYS/broker/load/bytes/sent/5min":        "The moving average of the number of bytes sent by the broker over different time intervals.",
+		"$SYS/broker/load/messages/received/5min": "The moving average of the number of all types of MQTT messages received by the broker over different time intervals.",
+		"$SYS/broker/load/messages/sent/5min":     "The moving average of the number of all types of MQTT messages sent by the broker over different time intervals.",
+		"$SYS/broker/load/sockets/5min":           "The moving average of the number of socket connections opened to the broker over different time intervals.",
 	}
+
 	counterMetrics = map[string]*MosquittoCounter{}
 	gaugeMetrics   = map[string]prometheus.Gauge{}
 )
@@ -178,13 +189,13 @@ func runServer(c *cli.Context) {
 
 // $SYS/broker/bytes/received
 func processUpdate(topic, payload string) {
-	//log.Printf("Got broker update with topic %s and data %s", topic, payload)
+	// log.Printf("Got broker update with topic %s and data %s", topic, payload)
 	if _, ok := ignoreKeyMetrics[topic]; !ok {
 		if _, ok := counterKeyMetrics[topic]; ok {
 			// log.Printf("Processing counter metric %s with data %s", topic, payload)
 			processCounterMetric(topic, payload)
 		} else {
-			//log.Printf("Processing gauge metric %s with data %s", topic, payload)
+			// log.Printf("Processing gauge metric %s with data %s", topic, payload)
 			processGaugeMetric(topic, payload)
 		}
 	}
