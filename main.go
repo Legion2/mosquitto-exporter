@@ -49,7 +49,6 @@ func main() {
 	app := cli.NewApp()
 
 	app.Name = appName
-	app.Version = versionString()
 	app.Authors = []cli.Author{
 		{
 			Name:  "Arturo Reuschenbach Puncernau",
@@ -105,8 +104,6 @@ func main() {
 }
 
 func runServer(c *cli.Context) {
-	log.Printf("Starting mosquitto_broker %s", versionString())
-
 	opts := mqtt.NewClientOptions()
 	opts.SetCleanSession(true)
 	opts.AddBroker(c.String("endpoint"))
